@@ -6,13 +6,19 @@ import { Chart as ChartJS, CategoryScale, LinearScale, BarElement, Title, Toolti
 
 ChartJS.register(CategoryScale, LinearScale, BarElement, Title, Tooltip, Legend);
 
-const BarChart = () => {
+interface BarChartProps {
+  labelBarchart: string[]
+  dataBarchart: number[]
+  title: string
+}
+
+const BarChart: React.FC<BarChartProps> = ({labelBarchart, dataBarchart, title}) => {
   const data = {
-    labels: ['January', 'February', 'March', 'April', 'May', 'June'],
+    labels: labelBarchart,
     datasets: [
       {
-        label: 'Sales',
-        data: [30, 20, 40, 50, 60, 70],
+        label: title,
+        data: dataBarchart,
         backgroundColor: 'rgba(75, 192, 192, 0.2)',
         borderColor: 'rgba(75, 192, 192, 1)',
         borderWidth: 1,

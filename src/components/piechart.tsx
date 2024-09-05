@@ -3,16 +3,23 @@
 import React from 'react';
 import { Pie } from 'react-chartjs-2';
 import { Chart as ChartJS, ArcElement, Tooltip, Legend } from 'chart.js';
+import ChartDataLabels from 'chartjs-plugin-datalabels';
 
-ChartJS.register(ArcElement, Tooltip, Legend);
+ChartJS.register(ArcElement, Tooltip, Legend, ChartDataLabels);
 
-const PieChart = () => {
+interface PieChartProps {
+  labelBarchart: string[]
+  dataBarchart: number[]
+  title: string
+}
+
+const PieChart: React.FC<PieChartProps> = ({labelBarchart, dataBarchart, title}) => {
   const data = {
-    labels: ['Red', 'Blue', 'Yellow', 'Green', 'Purple', 'Orange'],
+    labels: labelBarchart,
     datasets: [
       {
-        label: 'Votes',
-        data: [12, 19, 3, 5, 2, 3],
+        label: title,
+        data: dataBarchart,
         backgroundColor: [
           'rgba(255, 99, 132, 0.2)',
           'rgba(54, 162, 235, 0.2)',
@@ -34,9 +41,39 @@ const PieChart = () => {
     ],
   };
 
+  const options = {
+    plugins: {
+
+      datalabels: {
+        color: 'text-gray-500',
+        display: true,
+        formatter: (value: number, context: any) => {
+          const total = context.chart._metasets[context.datasetIndex].total;
+          const percentage = (value / total * 100).toFixed(2) + '%';
+          return percentage;
+        },  
+      },
+      legend: {
+        position: 'top' as const,
+      },
+      tooltip: {
+        callbacks: {
+          label: function (tooltipItem: any) {
+            const label = tooltipItem.label || '';
+            if (label) {
+              return `${label}: ${tooltipItem.raw}`;
+            }
+            return '';
+          },
+        },
+      },
+    },
+  };
+
   return (
     <>
-      <Pie data={data} />
+    <p className='text-center text-xs font-medium text-gray-500'>{title}</p>
+      <Pie data={data} options={options}/>
     </>
   );
 };
