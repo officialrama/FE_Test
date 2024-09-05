@@ -2,8 +2,12 @@ Test Coding FRONTEND JASA MARGA
 
 step running
 
-jalankan server backend
-ke terminal frontend
-ketik npm install
-ketik npm run build
-ketik npm run start
+1.jalankan server backend
+
+2.ke terminal frontend
+
+3.ketik npm install
+
+4.ketik npm run build
+
+5.ketik npm run start
