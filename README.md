@@ -11,3 +11,5 @@ step running
 4.ketik npm run build
 
 5.ketik npm run start
+
+![image](https://github.com/user-attachments/assets/735d313e-7e99-48d6-b068-dca37418e279)
