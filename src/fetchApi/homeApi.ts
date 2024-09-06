@@ -42,10 +42,29 @@ export const fetchApiGetLalin = async ({
 
 export const fetchApiGetMasterGerbang = async ({
   body, 
+  nama,
+  page
  }:{
-  body : {}
+  body : string,
+  nama : string,
+  page : number
  }) => {
-   const response = await fetch(`http://localhost:8080/api/gerbangs?${body}`);
+   const response = await fetch(`http://localhost:8080/api/gerbangs?limit=5?page=${page}`);
+   if (!response.ok) {
+     throw new Error('Network response was not ok');
+   }
+ 
+   return response.json();
+ };
+
+ export const fetchApiSearchMasterGerbang = async ({
+  body, 
+  nama
+ }:{
+  body : string,
+  nama : string
+ }) => {
+   const response = await fetch(`http://localhost:8080/api/gerbangs?${nama}=${body}&limit=5`);
    if (!response.ok) {
      throw new Error('Network response was not ok');
    }
@@ -54,7 +73,38 @@ export const fetchApiGetMasterGerbang = async ({
  };
 
 
- export const fetchApiCreateMasterGerbang = async ({
+ export const fetchApiUpdateMasterGerbang = async ({
+  id,
+  IdCabang,
+  NamaCabang,
+  NamaGerbang,
+}:{
+  id: Number,
+  IdCabang: Number,
+  NamaCabang : string,
+  NamaGerbang : string
+}) => {
+  const response = await fetch('http://localhost:8080/api/gerbangs', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json',
+    },
+    body: JSON.stringify({
+      id: id,
+      IdCabang: IdCabang,
+      NamaCabang : NamaCabang,
+      NamaGerbang : NamaGerbang
+    }),
+  });
+
+  if (!response.ok) {
+    throw new Error('Network response was not ok');
+  }
+
+  return response.json();
+};
+
+export const fetchApiCreateMasterGerbang = async ({
   id,
   IdCabang,
   ruas,
@@ -66,7 +116,7 @@ export const fetchApiGetMasterGerbang = async ({
   gerbang : string
 }) => {
   const response = await fetch('http://localhost:8080/api/gerbangs', {
-    method: 'PUT',
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json',
     },

@@ -5,7 +5,10 @@ import { useRouter } from "next/navigation";
 
 const Header = () => {
   const router = useRouter();
-
+  const [showInputs, setShowInputs] = React.useState(false);
+  const handleDropdownClick = () => {
+    setShowInputs(!showInputs);
+  };
   return (
     <>
         <header className="bg-gray-400">
@@ -16,10 +19,18 @@ const Header = () => {
                 <img alt="" src="/pt-jasa-marga.png" className="h-auto w-20 cursor-pointer" />
               </div>
             </div>
-            <div className="hidden lg:flex lg:flex-1 lg:justify-end">
-              <p onClick={() => router.push('/login')} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
+            <div className="relative right-14 flex flex-col gap-2 max-w-7">
+              <img src="/account-active.svg" onClick={handleDropdownClick}></img>
+              {showInputs && (
+              <p
+                    className="flex text-xs text-center  text-black p-1"
+                    onClick={() => router.push('/')}
+              >Logout
+              </p>)
+              }
+              {/* <p onClick={() => router.push('/')} className="text-sm font-semibold leading-6 text-gray-900 cursor-pointer">
                 Log in <span aria-hidden="true">&rarr;</span>
-              </p>
+              </p> */}
             </div>
           </nav>
         </header>

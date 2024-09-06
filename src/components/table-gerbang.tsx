@@ -102,9 +102,9 @@ const TableGerbang: React.FC<TabelGerbangProps> = ({
             </tr>
           </thead>
           <tbody className="text-gray-700">
-            {dataGerbang?.map((item) => (
-              <tr className="border-b" key={item.id}>
-                <td className="px-4 py-2">{item.id}</td>
+            {dataGerbang?.map((item, index) => (
+              <tr className="border-b" key={index}>
+                <td className="px-4 py-2">{index + 1}</td>
                 <td className="px-4 py-2">{item.NamaCabang}</td>
                 <td className="px-4 py-2">{item.NamaGerbang}</td>
                 <td className="px-4 py-2 flex space-x-2">

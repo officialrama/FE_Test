@@ -6,7 +6,7 @@ import TableGerbang from "@/components/table-gerbang";
 import ModalGerbang from '@/components/modal-gerbang';
 import ModalDelete from '@/components/modal-delete';
 import Header from '@/components/header';
-import { fetchApiGetMasterGerbang } from '@/fetchApi/homeApi';
+import { fetchApiGetMasterGerbang, fetchApiSearchMasterGerbang } from '@/fetchApi/homeApi';
 import { useMutation, useQuery } from '@tanstack/react-query';
 import { useHooksJasaMarga } from '../hooks/inputhooks';
 
@@ -15,8 +15,8 @@ const MasterGerbang = () => {
     const [editGerbang, setEditGerbang] = React.useState(false)
     const [showGerbang, setShowGerbang] = React.useState(false)
     const [deleteGerbang, setDeleteGerbang] = React.useState(false)
-    const [searchGerbang, setSearchGerbang] = React.useState()
-    const [searchGerbangType, setSearchGerbangType] = React.useState()
+    const [searchGerbang, setSearchGerbang] = React.useState('')
+    const [searchGerbangType, setSearchGerbangType] = React.useState('')
     const [showInputs, setShowInputs] = React.useState(false);
     const handleDropdownClick = () => {
       setShowInputs(!showInputs);
@@ -24,7 +24,7 @@ const MasterGerbang = () => {
     const handleClickItem = (e: any) => {
       console.log("er",e?.target?.innerText)
       const chooseType = e?.target?.innerText
-      setSearchGerbangType(chooseType) 
+      setSearchGerbangType(chooseType === 'Ruas' ? 'NamaCabang' : chooseType === 'Gerbang' ? 'NamaGerbang' : '') 
       setShowInputs(!showInputs);
     };
     const [dataDetailGerbang, setDataDetailGerbang] = React.useState({
@@ -36,22 +36,26 @@ const MasterGerbang = () => {
     
     const handleOpenGerbang = () => {
      setOpenGerbang(true)
+     setMasterForm({
+      id : 0,
+      IdCabang: 0,
+      ruas: '',
+      gerbang: '',
+     })
      setDataDetailGerbang({id : 0, IdCabang : 0})
     }
 
-    const { data: initialData, isLoading, isError: isInitialError, isSuccess } = useQuery({
+    const { data: initialData, isLoading, isError: isInitialError, isSuccess, refetch } = useQuery({
       queryKey: ['getInitialMasterGerbangData'],
-      queryFn: () => fetchApiGetMasterGerbang({ body: masterGerbangFilter}),
+      queryFn: () => fetchApiGetMasterGerbang({ body: searchGerbang, nama:searchGerbangType, page:1}),
       refetchOnWindowFocus: false,
-      enabled: true, 
     });
-  
     const { 
       data: filteredData, 
       mutate: getMasterGerbangData, 
-      isError 
+      isError, 
     } = useMutation({
-      mutationFn: () => fetchApiGetMasterGerbang({ body: masterGerbangFilter}),
+      mutationFn: () => fetchApiSearchMasterGerbang({ body: searchGerbang, nama:searchGerbangType}),
       onSuccess: (data) => {
         console.log('Master gerbang Data:', data);
       },
@@ -59,6 +63,22 @@ const MasterGerbang = () => {
         console.error('Error fetching data:', error);
       }
     });
+     
+    React.useEffect(() => {
+      if(openGerbang === false) {
+        refetch()
+      }
+    },[openGerbang])
+    const handleInputChange = (evt: React.ChangeEvent<HTMLInputElement>) => {
+      setSearchGerbang(evt.target.value);
+    };
+
+    const handleKeyDown = (evt: React.KeyboardEvent<HTMLInputElement>) => {
+      console.log('evt',evt)
+      if (evt.key === "Enter") {
+      getMasterGerbangData()
+      }
+    };
   
     const displayedData = filteredData || initialData;
 
@@ -73,7 +93,7 @@ const MasterGerbang = () => {
     <p className="text-lg font-semibold mx-10">Master Data Gerbang</p>
     <div className="flex gap-6 mx-10 mt-4 justify-between">
       <div className='flex flex-row gap-3'>
-      <input type="text" className="border-2 border-gray-500 rounded-lg" placeholder="Search">
+      <input type="text" name='cari' id='cari' className="border-2 border-gray-500 rounded-lg" value={searchGerbang} onKeyDown={handleKeyDown} onChange={handleInputChange} placeholder="Search">
     </input>
     <div className='absolute ml-56 flex flex-col gap-2 w-40 '>
     <button
@@ -81,7 +101,7 @@ const MasterGerbang = () => {
           className="inline-flex flex-row border whitespace-nowrap text-center justify-center items-center rounded-lg bg-gray-500 text-white p-1"
           id="options-menu"
           onClick={handleDropdownClick}
-    >{searchGerbangType ? searchGerbangType : 'Pilih Tipe Pencarian'}
+    >{searchGerbangType === 'NamaCabang' ? 'Ruas' : searchGerbangType === 'NamaGerbang' ? 'Gerbang' : 'Pilih Tipe Pencarian'}
     </button>
     {showInputs && (
       <>
@@ -107,7 +127,7 @@ const MasterGerbang = () => {
      + Tambah
      </button>
     </div>
-    <TableGerbang data={displayedData?.data} openGerbang={openGerbang} setOpenGerbang={setOpenGerbang} editGerbang={editGerbang} setEditGerbang={setEditGerbang} showGerbang={showGerbang} setShowGerbang={setShowGerbang} deleteGerbang={deleteGerbang} setDeleteGerbang={setDeleteGerbang} setDataDetailGerbang={setDataDetailGerbang} setMasterForm={setMasterForm}/>
+    <TableGerbang data={displayedData?.data} openGerbang={openGerbang} setOpenGerbang={setOpenGerbang} editGerbang={editGerbang} setEditGerbang={setEditGerbang} showGerbang={showGerbang} setShowGerbang={setShowGerbang} deleteGerbang={deleteGerbang} setDeleteGerbang={setDeleteGerbang} setDataDetailGerbang={setDataDetailGerbang} setMasterForm={setMasterForm} />
      </div>
      <ModalGerbang openGerbang={openGerbang} setOpenGerbang={setOpenGerbang} editGerbang={editGerbang} setEditGerbang={setEditGerbang} showGerbang={showGerbang} setShowGerbang={setShowGerbang} dataDetailGerbang={dataDetailGerbang} masterForm={masterForm} setMasterForm={setMasterForm}/> 
      <ModalDelete deleteGerbang={deleteGerbang} setDeleteGerbang={setDeleteGerbang}/>

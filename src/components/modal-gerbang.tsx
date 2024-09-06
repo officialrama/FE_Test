@@ -1,7 +1,6 @@
 'use client'
 
-import { useHooksJasaMarga } from '@/app/hooks/inputhooks';
-import { fetchApiCreateMasterGerbang } from '@/fetchApi/homeApi';
+import { fetchApiCreateMasterGerbang, fetchApiUpdateMasterGerbang } from '@/fetchApi/homeApi';
 import { useMutation } from '@tanstack/react-query';
 import * as React from 'react';
 
@@ -17,6 +16,13 @@ interface MasterGerbangForm {
   IdCabang: number;
 }
 
+interface MasterGerbangV2 {
+  NamaCabang: string;
+  NamaGerbang: string;
+  id: number;
+  IdCabang: number;
+}
+
 interface ModalGerbangProps {
   openGerbang: boolean;
   setOpenGerbang: React.Dispatch<React.SetStateAction<boolean>>;
@@ -25,12 +31,12 @@ interface ModalGerbangProps {
   showGerbang: boolean;
   setShowGerbang: React.Dispatch<React.SetStateAction<boolean>>;
   dataDetailGerbang: RowData,
-  masterForm: MasterGerbangForm,
+  masterForm: any,
   setMasterForm : React.Dispatch<React.SetStateAction<MasterGerbangForm>>
 }
 
 const ModalGerbang: React.FC<ModalGerbangProps> = ({ openGerbang , setOpenGerbang, editGerbang, setEditGerbang, showGerbang, setShowGerbang, dataDetailGerbang, masterForm, setMasterForm }) => {
-
+ const [masterv2, setMasterV2] = React.useState <any | []>({})
  const handleCloseGerbang = () => {
    setOpenGerbang(false)
    setEditGerbang(false)
@@ -44,26 +50,57 @@ const ModalGerbang: React.FC<ModalGerbangProps> = ({ openGerbang , setOpenGerban
   }));
 };
 const {
-  mutate: save_mastergerbang,
+  mutate: edit_mastergerbang,
 } = useMutation({
-  mutationFn: fetchApiCreateMasterGerbang,
+  mutationFn: fetchApiUpdateMasterGerbang,
     onError: (error) => {
       console.error("Gagal, Ulangi Lagi", error);
     }
   });
 
+  const {
+    mutate: save_mastergerbang,
+  } = useMutation({
+    mutationFn: fetchApiCreateMasterGerbang,
+      onError: (error) => {
+        console.error("Gagal, Ulangi Lagi", error);
+      }
+    });
+  const [randomNumber, setRandomNumber] = React.useState<number | null >(null)
+  React.useEffect(() => {
+      if(editGerbang === false && showGerbang === false){
+          const generatedAutoNumber = Math.floor(Math.random() * (900 - 100 + 1)) + 100
+         const generatedNumber = generatedAutoNumber
+         setRandomNumber(generatedNumber)
+        setMasterForm({
+          id : Number(randomNumber),
+          IdCabang : 37,
+          gerbang : masterForm?.gerbang,
+          ruas : masterForm?.ruas
+        })
+      }
+  },[editGerbang, showGerbang , openGerbang ])
+
+   React.useEffect(() => {
+    if(editGerbang === true){
+    setMasterV2({
+      id: masterForm.id,
+      IdCabang: masterForm.IdCabang,
+      NamaCabang : masterForm.ruas,
+      NamaGerbang : masterForm.gerbang
+    })}
+   },[editGerbang])
   const handleSaveMasterGerbang = () => {
     if(editGerbang === true) {
-      const Method = 'PUT'
-      save_mastergerbang(masterForm, Method)
+      edit_mastergerbang(masterv2)
     } else {
-      const Method = 'POST'
-      save_mastergerbang(masterForm, Method)
+      save_mastergerbang(masterForm)
     }
     setOpenGerbang(false)
   }
  console.log('test',dataDetailGerbang)
  console.log('dast',masterForm)
+ console.log('dastasd',masterv2)
 return(
  <>
      <div
